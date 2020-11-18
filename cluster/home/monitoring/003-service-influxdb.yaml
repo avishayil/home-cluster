@@ -1,0 +1,25 @@
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: influxdb
+  namespace: monitoring
+  labels:
+    app: influxdb
+    kubernetes.io/name: influxdb
+spec:
+  ports:
+    - name: influxdb-http
+      protocol: TCP
+      port: 8086
+      targetPort: 8086
+      nodePort: 31566
+    - name: influxdb-rpc
+      protocol: TCP
+      port: 8083
+      targetPort: 8083
+      nodePort: 32098
+  selector:
+    app: influxdb
+  type: NodePort

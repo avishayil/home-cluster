@@ -1,0 +1,64 @@
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: cloudflare-ddns
+  namespace: cloudflare
+  labels:
+    app: cloudflare-ddns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflare-ddns
+  template:
+    metadata:
+      labels:
+        app: cloudflare-ddns
+    spec:
+      volumes:
+        - name: secrets-volume
+          emptyDir: {}
+      initContainers:
+        - name: init-secrets
+          image: busybox:1.28
+          volumeMounts:
+            - name: secrets-volume
+              mountPath: /tmp/secrets
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare
+                  key: API_KEY
+          command: ['sh', '-c', "echo $API_KEY > /tmp/secrets/API_KEY"]
+      containers:
+        - name: cloudflare-ddns
+          image: 'oznu/cloudflare-ddns:armhf'
+          envFrom:
+            - configMapRef:
+                name: cloudflare-config
+          volumeMounts:
+            - name: secrets-volume
+              readOnly: true
+              mountPath: "/tmp/secrets"
+          resources:
+            limits:
+              cpu: 50m
+              memory: 10Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

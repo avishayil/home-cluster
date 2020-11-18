@@ -1,0 +1,57 @@
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: homeassistant
+  namespace: homeassistant
+  labels:
+    app: homeassistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homeassistant
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: homeassistant
+    spec:
+      volumes:
+        - name: config-volume
+          nfs:
+            server: 10.0.0.29
+            path: /export/kube-storage/homeassistant
+      containers:
+        - name: raspberrypi3-homeassistant
+          image: 'homeassistant/raspberrypi3-homeassistant:stable'
+          resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+          ports:
+            - name: http
+              containerPort: 8123
+              protocol: TCP
+          volumeMounts:
+            - name: config-volume
+              mountPath: /config
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+      restartPolicy: Always
+      hostNetwork: true
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

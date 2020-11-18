@@ -1,0 +1,20 @@
+---
+
+version: '3'
+
+env:
+  KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+tasks:
+  apply:
+    desc: Apply manifests to the Kubernetes cluster
+    cmds:
+      - task: apply-manifest-templates
+  flux-sync:
+    desc: Force cluster to run flux
+    cmds:
+      - fluxctl sync
+  apply-manifest-templates:
+    desc: Apply manifests to the Kubernetes cluster
+    cmds:
+      - ./hack/apply-manifest-templates.sh

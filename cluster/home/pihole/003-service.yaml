@@ -1,0 +1,20 @@
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: pihole
+  namespace: pihole
+  labels:
+    app: pihole
+    kubernetes.io/name: pihole
+spec:
+  ports:
+    - name: adminui
+      protocol: TCP
+      port: 30000
+      targetPort: 80
+  selector:
+    app: pihole
+  externalIPs:
+    - 10.0.0.10

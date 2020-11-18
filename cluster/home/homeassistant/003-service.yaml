@@ -1,0 +1,21 @@
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: homeassistant
+  namespace: homeassistant
+  labels:
+    app: homeassistant
+    kubernetes.io/name: homeassistant
+spec:
+  ports:
+    - name: homeassistant
+      protocol: TCP
+      port: 8123
+      targetPort: 8123
+      nodePort: 30438
+  selector:
+    app: homeassistant
+  type: NodePort
+  sessionAffinity: None

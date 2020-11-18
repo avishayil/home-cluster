@@ -1,0 +1,84 @@
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mosquitto
+  namespace: mosquitto
+  labels:
+    app: mosquitto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: mosquitto
+    spec:
+      volumes:
+        - name: mosquitto-conf
+          configMap:
+            name: mosquitto
+            defaultMode: 420
+        - name: secrets-volume
+          emptyDir: {}
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: ''
+      initContainers:
+        - name: init-secrets
+          image: busybox:1.28
+          volumeMounts:
+            - name: secrets-volume
+              mountPath: /tmp/secrets
+          env:
+            - name: PASSWORDFILE
+              valueFrom:
+                secretKeyRef:
+                  name: mosquitto
+                  key: passwordfile
+          command: ['sh', '-c', "echo $PASSWORDFILE > /tmp/secrets/passwordfile"]
+      containers:
+        - name: mosquitto
+          image: 'eclipse-mosquitto:1.6.8'
+          ports:
+            - containerPort: 1883
+              protocol: TCP
+            - containerPort: 9001
+              protocol: TCP
+            - containerPort: 8883
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 500Mi
+          volumeMounts:
+            - name: mosquitto-conf
+              readOnly: true
+              mountPath: /mosquitto/config/mosquitto.conf
+              subPath: mosquitto.conf
+            - name: secrets-volume
+              readOnly: true
+              mountPath: /mosquitto/config/passwordfile
+              subPath: passwordfile
+            - name: localtime
+              mountPath: /etc/localtime
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

@@ -1,0 +1,12 @@
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflare-config
+  namespace: cloudflare
+data:
+  PROXIED: 'true'
+  ZONE: barfamily.co.il
+  SUBDOMAIN: home
+  API_KEY_FILE: /tmp/secrets/API_KEY

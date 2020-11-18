@@ -1,0 +1,21 @@
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: switcher-webapi
+  namespace: switcher
+  labels:
+    app: switcher-webapi
+    kubernetes.io/name: switcher-webapi
+spec:
+  ports:
+    - name: switcher-webapi
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30209
+  selector:
+    app: switcher-webapi
+  type: NodePort
+  sessionAffinity: None
