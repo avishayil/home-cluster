@@ -38,10 +38,6 @@ spec:
     port: 8100
     protocol: TCP
     targetPort: 8100
-  - name: deconzui
-    port: 32767
-    protocol: TCP
-    targetPort: 32767
   selector:
     app: traefik
     release: traefik
