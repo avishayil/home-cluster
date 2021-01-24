@@ -1,5 +1,3 @@
----
-
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -17,16 +15,44 @@ spec:
       labels:
         app: zigbee2mqttassistant
     spec:
+      volumes:
+        - name: secrets-volume
+          emptyDir: {}
+      initContainers:
+        - name: init-secrets
+          image: busybox:1.28
+          volumeMounts:
+            - name: secrets-volume
+              mountPath: /tmp/secrets
+          env:
+            - name: APPSETTINGS
+              valueFrom:
+                secretKeyRef:
+                  name: zigbee2mqtt
+                  key: appsettings.json
+          command: ['sh', '-c', "echo $APPSETTINGS > /tmp/secrets/appsettings.json"]
       containers:
         - name: zigbee2mqttassistant
           image: 'carldebilly/zigbee2mqttassistant'
+          env:
+            - name: TZ
+              value: 'Asia/Jerusalem'
+            - name: Z2MA_SETTINGS__MQTTSECURE
+              value: 'false'
+            - name: ASPNETCORE_URLS
+              value: 'http://*:8888'
           envFrom:
             - secretRef:
-                name: zigbee2mqtt
+                name: 'Z2MA_SETTINGS__MQTTUSERNAME'
           resources:
             limits:
               cpu: 200m
               memory: 100Mi
+          volumeMounts:
+            - name: secrets-volume
+              readOnly: true
+              mountPath: /app/appsettings.json
+              subPath: appsettings.json
           imagePullPolicy: IfNotPresent
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
