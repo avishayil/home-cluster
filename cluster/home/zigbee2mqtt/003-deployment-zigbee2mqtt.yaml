@@ -31,7 +31,7 @@ spec:
             path: /run/udev
             type: ''
       containers:
-        - name: deconz
+        - name: zigbee2mqtt
           image: 'koenkk/zigbee2mqtt'
           env:
             - name: TZ
