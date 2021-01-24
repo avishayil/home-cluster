@@ -1,0 +1,45 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: zigbee2mqttassistant
+  namespace: zigbee2mqtt
+  labels:
+    app: zigbee2mqttassistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zigbee2mqttassistant
+  template:
+    metadata:
+      labels:
+        app: zigbee2mqttassistant
+    spec:
+      containers:
+        - name: zigbee2mqttassistant
+          image: 'carldebilly/zigbee2mqttassistant'
+          env:
+            - name: TZ
+              value: 'Asia/Jerusalem'
+            - name: 'Z2MA_SETTINGS__MQTTSERVER'
+              value: '10.0.0.10'
+            - name: 'Z2MA_SETTINGS__MQTTPORT'
+              value: '31612'
+            - name: 'Z2MA_SETTINGS__MQTTSECURE'
+              value: 'false'
+          envFrom:
+            - secretRef:
+                name: zigbee2mqtt
+          resources:
+            limits:
+              cpu: 200m
+              memory: 100Mi
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%

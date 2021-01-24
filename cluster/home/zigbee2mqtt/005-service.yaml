@@ -1,0 +1,20 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: zigbee2mqttassistant
+  namespace: zigbee2mqtt
+  labels:
+    app: zigbee2mqttassistant
+    kubernetes.io/name: zigbee2mqttassistant
+spec:
+  ports:
+    - name: zigbee2mqttassistantui
+      protocol: TCP
+      port: 31000
+      targetPort: 80
+      nodePort: 31000
+  selector:
+    app: zigbee2mqttassistant
+  type: NodePort
+  sessionAffinity: None
+  externalTrafficPolicy: Cluster
