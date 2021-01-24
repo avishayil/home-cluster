@@ -13,7 +13,7 @@ spec:
     - name: zigbee2mqttassistantui
       protocol: TCP
       port: 31000
-      targetPort: 80
+      targetPort: 8888
       nodePort: 31000
   selector:
     app: zigbee2mqttassistant
