@@ -41,9 +41,6 @@ spec:
               value: 'false'
             - name: ASPNETCORE_URLS
               value: 'http://*:8888'
-          envFrom:
-            - secretRef:
-                name: 'Z2MA_SETTINGS__MQTTUSERNAME'
           resources:
             limits:
               cpu: 200m
