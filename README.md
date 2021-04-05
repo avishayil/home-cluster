@@ -31,12 +31,8 @@ _This table is a reference to Node Ports in my cluster and may not be fully up-t
 |--------------------------|------------------------|
 | home-assistant           | 30438                  |
 | deconz                   | 32767 (ui) 32766 (ws)  |
-| influxdb                 | 31566 (db) 32098 (rpc) |
-| grafana                  | 31272                  |
 | pihole                   | 30000 (lb)             |
 | switcher                 | 30209                  |
-| mysql                    | 30889                  |
-| opencv                   | 32168                  |
 | mosquitto                | 31612                  |
 
 ---
